@@ -1,0 +1,31 @@
+name: Daily HKD Report
+
+on:
+  schedule:
+    # 01:30 UTC = 09:30 Heure de Hong Kong (Ouverture Bourse)
+    # Vérifiez votre fuseau horaire préféré
+    - cron: '30 1 * * 1-5' # Du Lundi au Vendredi à 1h30 UTC
+  workflow_dispatch: # Permet de lancer manuellement pour tester
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Setup Python
+        uses: actions/setup-python@v2
+        with:
+          python-version: '3.9'
+
+      - name: Install libraries
+        run: |
+          pip install requests yfinance
+
+      - name: Run Report Script
+        env:
+          EMAIL_SENDER: ${{ secrets.EMAIL_SENDER }}
+          EMAIL_PASSWORD: ${{ secrets.EMAIL_PASSWORD }}
+          EMAIL_RECIPIENTS: ${{ secrets.EMAIL_RECIPIENTS }}
+        run: python email_bot.py
